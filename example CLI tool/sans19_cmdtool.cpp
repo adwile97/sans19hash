@@ -4,7 +4,6 @@
 #include <iostream>
 #include <fstream>
 #include <iomanip>
-#include <cmath>
 #include <cstdint>
 #include <cstring>
 #include <sstream>
@@ -22,9 +21,7 @@ uint64_t colorpuzzle(uint64_t v, uint64_t k) {
 }
 
 uint16_t blend4(uint64_t sans, uint64_t deltarune) {
-    double root_val = std::pow(static_cast<double>(sans & UINT64_MAX), 1.0 / (static_cast<int>(deltarune % 8) + 2));
-    sans = static_cast<uint64_t>(root_val) * 0x100000;
-    sans &= 0xFFFFFFFF;
+    sans ^= deltarune >> 32;
     sans ^= sans >> 35;
     sans &= 0xFFFF;
     sans ^= sans >> deltarune;
@@ -66,13 +63,10 @@ class Sans19Hash {
             tail ^= length & 0xFFFF;
             tail = colorpuzzle(tail, SANS19_CONST ^ SANS19_PRIME);
             std::string out;
+            char buf[8];
             for (int i = 0; i < 4; ++i) {
-                char buf[8];
-                for (int i = 0; i < 4; ++i) {
-                    std::memcpy(buf, &state[i], 8);
-                    out.append(buf, 8);
-                }
-
+                std::memcpy(buf, &state[i], 8);
+                out.append(buf, 8);
             }
 
             char buf[8];
