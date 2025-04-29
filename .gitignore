@@ -1,0 +1,63 @@
+# Compiled files
+*.o
+*.obj
+*.so
+*.dll
+*.exe
+*.out
+*.a
+*.lib
+*.pdb
+
+# Build directories
+/build/
+/bin/
+/target/
+/out/
+
+# IDE/Editor files
+.idea/
+.vscode/
+*.iml
+*.swp
+*.swo
+*~
+
+# Log files
+*.log
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Python bytecode (if you're using Python for testing or tools)
+__pycache__/
+*.pyc
+*.pyo
+
+# CMake or Makefiles (if applicable)
+CMakeFiles/
+Makefile
+CMakeCache.txt
+
+# Miscellaneous temporary files
+*.tmp
+*.bak
+*.swp
+*.swo
+
+# Test outputs
+/test-output/
+/test-results/
+
+# Documentation files (if any generated documentation)
+*.pdf
+*.html
+*.docx
+
+# Package manager files (if applicable)
+node_modules/
+package-lock.json
+
+# .vscode editor settings
+.vscode/
