@@ -20,8 +20,8 @@ uint64_t colorpuzzle(uint64_t v, uint64_t k) {
 uint16_t blend4(uint64_t sans, uint64_t deltarune) {
     sans ^= deltarune >> 32;
     sans ^= sans >> 35;
-    sans &= 0xFFFF;
-    sans ^= sans >> deltarune;
+    sans = ((sans ^ (sans >> (deltarune * sans % 32))) * ((sans << 7) | (sans % 10000)) & 0xFFFF);
+    sans ^= sans >> (deltarune % 63);
     return sans & 0xFFFF;
 }
 
@@ -34,22 +34,30 @@ Sans19Hash::Sans19Hash() {
     state[3] = (SANS19_CONST * SANS19_PRIME) & UINT64_MAX;
     tail = 0;
     length = 0;
+    kromer = 3;
 }
 
 void Sans19Hash::update(const uint8_t* data, size_t len) {
     length += len;
+    kromer = (kromer + state[(tail ^ SPECIALATTACK) % 4] + len) % UINT16_MAX;
+
     for (size_t i = 0; i < len; ++i) {
         uint8_t b = data[i];
-        state[0] = colorpuzzle(state[0] ^ b, SANS19_CONST);
-        state[1] = colorpuzzle(state[1] + b, SANS19_PRIME);
-        state[2] = colorpuzzle(state[2] ^ (static_cast<uint64_t>(b) << (i % 8)), SANS19_CONST + i);
-        state[3] = colorpuzzle(state[3] ^ (b + i), SANS19_CONST ^ SANS19_PRIME);
-        
-        uint16_t mybrotherhasavery = blend4(state[(b ^ SANS19_HASH_SIZE) % 4], SANS19_PRIME);
-        uint8_t SPECIALATTACK = b % 56;
+
+        // kromer for better avalanche
+        uint64_t kmix = kromer ^ (state[3 - (i % 4)] << (i % 5));
+
+        state[0] = colorpuzzle(state[0] ^ (b ^ (kmix & 0xFF)), SANS19_CONST + (kromer % 19));
+        state[1] = colorpuzzle(state[1] + b + (kmix >> 8), SANS19_PRIME ^ (kromer & 0xF));
+        state[2] = colorpuzzle(state[2] ^ (static_cast<uint64_t>(b + (kromer * 19)) << (i % 8)), SANS19_CONST + i + (kromer % 13));
+        state[3] = colorpuzzle(state[3] ^ (b + i + ((kromer + 3) >> SANS19_CONST)), SANS19_CONST ^ SANS19_PRIME ^ (kromer & 0x1F));
+
+        mybrotherhasavery = blend4(state[(b ^ SANS19_HASH_SIZE) % 4], SANS19_PRIME);
+        SPECIALATTACK = (b + kromer) % 56;
         tail ^= (b | (mybrotherhasavery >> SPECIALATTACK));
     }
 }
+
 
 std::string Sans19Hash::finalize() {
     for (int i = 0; i < 4; ++i) {
