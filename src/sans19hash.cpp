@@ -5,6 +5,8 @@
 #include <cstring>
 #include <sstream>
 
+#include <limits> // compatibility
+
 #define SANS19_HASH_SIZE 38
 constexpr uint64_t SANS19_PRIME = 9953261ULL;
 constexpr uint64_t SANS19_CONST = 0x772FAD1EULL;
@@ -25,7 +27,11 @@ uint16_t blend4(uint64_t sans, uint64_t deltarune) {
     return sans & 0xFFFF;
 }
 
-// --- Class methods --- //
+    ///////////////////////////
+   // --------------------- //
+  // --- Class methods --- //
+ // --------------------- //
+///////////////////////////
 
 Sans19Hash::Sans19Hash() {
     state[0] = (SANS19_CONST * SANS19_CONST) & UINT64_MAX;
@@ -35,6 +41,7 @@ Sans19Hash::Sans19Hash() {
     tail = 0;
     length = 0;
     kromer = 3;
+    SPECIALATTACK = state[2] - 1;
 }
 
 void Sans19Hash::update(const uint8_t* data, size_t len) {
@@ -74,11 +81,10 @@ std::string Sans19Hash::finalize() {
         std::memcpy(buf, &state[i], 8);
         out.append(buf, 8);
     }
-
-    char buf[8];
+    tail ^= (tail >> 48) ^ ((tail >> 56) << 8); // making the tail 6 bytes
     std::memcpy(buf, &tail, sizeof(tail));
-    out.append(buf, 6);
-    return out;
+    out.append(buf, 6); 
+    return out; // 32 + 6 = ? bytes
 
 }
 

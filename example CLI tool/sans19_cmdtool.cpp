@@ -7,9 +7,14 @@
 #include "../include/sans19hash.h"
 
 int main(int argc, char* argv[]) {
-    if (argc != 2) {
-        std::cerr << "Usage: " << argv[0] << " <filename>\n";
+    if (argc < 2 || argc > 3) {
+        std::cerr << "Usage: " << argv[0] << " <filename> [--raw]\n";
         return 1;
+    }
+    
+    bool rawMode = false;
+    if (argc == 3 && std::string(argv[2]) == "--raw") {
+        rawMode = true;
     }
 
     std::ifstream file(argv[1], std::ios::binary);

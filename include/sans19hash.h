@@ -10,7 +10,7 @@ class Sans19Hash {
 public:
     Sans19Hash();
     void update(const uint8_t* data, size_t len);
-    std::string finalize();   // Raw binary
+    std::string finalize(); // Raw binary
     std::string hexdigest(); // Hex string
 
 private:
