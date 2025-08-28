@@ -12,7 +12,8 @@ public:
     void update(const uint8_t* data, size_t len);
     std::string finalize(); // Raw binary
     std::string hexdigest(); // Hex string
-
+    static bool self_test();
+    
 private:
     uint64_t state[4];
     uint64_t tail;

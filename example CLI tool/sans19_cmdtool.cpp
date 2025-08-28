@@ -7,6 +7,13 @@
 #include "../include/sans19hash.h"
 
 int main(int argc, char* argv[]) {
+
+    if (Sans19Hash::self_test()) {
+        std::cout << "Self-test passed\n";
+    } else {
+        std::cout << "Self-test failed\n";
+    }
+
     if (argc < 2 || argc > 3) {
         std::cerr << "Usage: " << argv[0] << " <filename> [--raw]\n";
         return 1;
