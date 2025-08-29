@@ -11,7 +11,9 @@ public:
     Sans19Hash();
     void update(const uint8_t* data, size_t len);
     std::string finalize(); // Raw binary
+    std::string finalize256();
     std::string hexdigest(); // Hex string
+    std::string hexdigest256();
     static bool self_test();
     
 private:
