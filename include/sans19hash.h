@@ -1,4 +1,4 @@
-// sans19_hash.h
+// sans19hash.h
 #ifndef SANS19_HASH_H
 #define SANS19_HASH_H
 
@@ -6,9 +6,9 @@
 #include <cstddef>
 #include <cstdint>
 
-class Sans19Hash {
+class s19h {
 public:
-    Sans19Hash();
+    s19h();
     void update(const uint8_t* data, size_t len);
     std::string finalize(); // Raw binary
     std::string finalize256();
@@ -19,7 +19,7 @@ public:
 private:
     uint64_t state[4];
     uint64_t tail;
-    size_t length;
+    uint64_t length;
     uint16_t kromer;
     uint16_t mybrotherhasavery;
     uint8_t SPECIALATTACK;

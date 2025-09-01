@@ -8,7 +8,7 @@
 
 int main(int argc, char* argv[]) {
 
-    if (Sans19Hash::self_test()) {
+    if (s19h::self_test()) {
         std::cout << "Self-test passed\n";
     } else {
         std::cout << "Self-test failed\n";
@@ -33,7 +33,7 @@ int main(int argc, char* argv[]) {
     std::vector<uint8_t> buffer((std::istreambuf_iterator<char>(file)),
                                  std::istreambuf_iterator<char>());
 
-    Sans19Hash hasher;
+    s19h hasher;
     hasher.update(buffer.data(), buffer.size());
     std::string hash = hasher.hexdigest();
 

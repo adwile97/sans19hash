@@ -16,7 +16,7 @@ int main() {
     };
 
     for (const char* s : test_strings) {
-        Sans19Hash h;
+        s19h h;
         h.update(reinterpret_cast<const uint8_t*>(s), strlen(s));
         std::string hex = h.hexdigest();
         std::cout << hex << std::endl;
