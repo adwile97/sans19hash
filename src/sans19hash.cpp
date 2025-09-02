@@ -7,7 +7,6 @@
 
 #include <limits> // compatibility
 
-#define SANS19_HASH_SIZE 38
 #define rotl64(bits,word) \
                 (((word) << (bits)) | ((word) >> (64-(bits))))
 
