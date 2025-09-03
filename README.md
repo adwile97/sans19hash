@@ -6,7 +6,7 @@ A completely custom, non-standard, state-based C++ hash function family. With a 
 
 This library provides a C++ implementation of the **two** sans19 hash functions:
 
-- **sans19-304**: The original 38-byte implementation. Insecure, experimental, and fun.
+- **sans19-304**: The original 38-byte implementation.
    - Usage for strings:
      ```cpp
      #include "sans19hash.h"
@@ -17,7 +17,7 @@ This library provides a C++ implementation of the **two** sans19 hash functions:
      std::string rawhash = hasher.finalize(); // for binary data
      std::string hexhash = hasher.hexdigest(); // for hex string
      ```
-- **sans19-256**: The more excusable, cryptographically viable 32-byte implementation.
+- **sans19-256**: The more useful 32-byte implementation.
    - Usage for strings:
      ```cpp
      #include "sans19hash.h"
@@ -35,3 +35,4 @@ You can update the hash in chunks of any byte size, and the final digest will be
 # DISCLAIMER
 Sans19 is actively being tested and tweaked. The math and output may change in future versions.
 This is **not** a stable or finalized implementation. **Do not use this API for any purpose in any serious project before it is finalized.** Even then, do your own research.
+I will not call any of these hash functions cryptographically viable if I have no evidence to suggest so.
