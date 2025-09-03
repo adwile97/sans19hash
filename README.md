@@ -1,6 +1,6 @@
 # sans19hash
 
-A completely custom, non-standard, state-based C++ hash function family. With a taste of Undertale.
+A completely custom, non-standard, state-based C++ hash function family.
 
 ## Overview
 
