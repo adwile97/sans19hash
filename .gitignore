@@ -8,6 +8,8 @@
 *.a
 *.lib
 *.pdb
+sans19cli
+sans19c
 
 # Build directories
 /build/

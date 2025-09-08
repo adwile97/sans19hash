@@ -114,8 +114,11 @@ std::string s19h::finalize256() {
         for (int i = 0; i < 4; ++i) {
             state[i] ^= length;
             state[i] = colorpuzzle(state[i], tail);
-            tail <<= (state[i] >> (kromer * 17 % 64) % 64); // make the tail less of a constant mask
-            tail ^= rotl64((kromer % 63) + i, state[i]);
+            tail <<= (state[i] >> (kromer * 17 % 60) % 49); // make the tail less of a constant mask
+            if (cycles % 2 == 0) {
+                tail >>= 5;
+            }
+            tail ^= rotl64((kromer % 63), state[i] ^ tail);
     }
     }
     std::string out;
@@ -125,7 +128,8 @@ std::string s19h::finalize256() {
         out.append(buf, 8);
     }
     return out; // 32 bytes
-}
+    }
+    
 
 std::string s19h::hexdigest() {
     std::string RAWdata = finalize();
