@@ -11,7 +11,7 @@
                 (((word) << (bits)) | ((word) >> (64-(bits))))
 
 uint64_t rotl64(int bits, uint64_t word) {
-    if (bits == 0) return rotl64((word+bits) & 63, word+1); // we use the edge case to our advantage
+    if (bits == 0) return rotl64(word & 63, word+1); // we use the edge case to our advantage
     return rotateleft(bits, word);
 }
 
