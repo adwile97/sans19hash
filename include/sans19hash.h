@@ -6,6 +6,14 @@
 #include <cstddef>
 #include <cstdint>
 
+struct TestVector {
+    const char* input;
+    const char* expected_hex;
+};
+
+const int NUM_TEST_VECTORS = 9;
+extern TestVector test_vectors[];
+
 class s19h {
 public:
     s19h();

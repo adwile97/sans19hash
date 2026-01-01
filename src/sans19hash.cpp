@@ -11,7 +11,7 @@
                 (((word) << (bits)) | ((word) >> (64-(bits))))
 
 uint64_t rotl64(int bits, uint64_t word) {
-    if (bits == 0) return word ^ rotl64(word + 1, (word+1)%60); // fixing the UB by making the case even stronger
+    if (bits == 0) return rotl64((word+bits) & 63, word+1); // we use the edge case to our advantage
     return rotateleft(bits, word);
 }
 
@@ -104,6 +104,8 @@ void s19h::update(const uint8_t* data, size_t len) {
 }
 
 
+// todo: make these not change the hash
+
 std::string s19h::finalize() {
     for (int i = 0; i < 4; ++i) {
         state[i] ^= length;
@@ -138,15 +140,16 @@ std::string s19h::finalize256() {
             }
             tail ^= rotl64((kromer % 63), state[i] ^ tail);
             kromer ^= ((tail ^ state[i]) & 0xFFFF);
-    }
+        }
     }
     std::string out;
     char buf[8];
     for (int i = 0; i < 4; ++i) {
         write_be64(reinterpret_cast<uint8_t*>(buf), state[i]);
-        out.append(buf, 8); }
-        return out; // 32 bytes
+        out.append(buf, 8);
     }
+        return out; // 32 bytes
+}
     
 
 std::string s19h::hexdigest() {
@@ -167,34 +170,29 @@ std::string s19h::hexdigest256() {
     return oss.str();
 }
 
+TestVector test_vectors[] = {
+    // Empty string hash (reference o implemenutput from originaltation)
+    {"","f87e1a2c43115bfd3bfff3095b2382576ecb3a676cb5aade189803d38acf80486f920d983db3"},
+    // Hash of "sans19" (reference output from original implementation)
+    {"sans19","7ec9bb0e080619c88190327ec27047cd749077f1d9257b9252f1405c36e349cd0df89b92c93e"},
+    // Hash of "YOUR TAKING TOO LONG" (used for regression testing)
+    {"YOUR TAKING TOO LONG", "ddbae741f114f5fca6a57a87f4ca37d0fa3da531e5440eed58125373049208dfe78783f5fbf2"},
+    // Hash of "YOUR         LONG" (tests handling of multiple spaces)
+    {"YOUR         LONG", "af25d71dd58ab5e196dc4b082c5c75741fa3ea7285f353ab92a54abca9fc42fb3407bbbafde6"},
+    // Hash of "your taking too long :)" (tests lowercase and punctuation)
+    {"your taking too long :)", "bd4036fce521f4bc977bc794aa32a2463b027f3c27b7edada912a5092147aaf6627e9d62e98f"},
+    // Hash of "your taking too long :) IS TAKING TOO LONG" (longer input, mixed case)
+    {"your taking too long :) IS TAKING TOO LONG", "4f9bb477302dcf48e6f259ad876a7840b3f699c228d6bc09fdb0d2d7e5890348a43fb24f3926"},
+    // Hash of "YOUR TOO BRIGHT" (different phrase, regression test)
+    {"YOUR TOO BRIGHT", "a59b95fa0d5f390cadd50a6ff8713ec0dff7d5f3711bd1f1f9fe8c91e674c115975e9afc6164"},
+    // Hash of "YOUR TAKING TOO TOO" (repeated words, regression test)
+    {"YOUR TAKING TOO TOO", "d6bf0031960e84a5ceb7131049e2744471b9604632f41fbf2603b2ccaca613be98265622af08"},
+    // Hash of "YOUR         TOO TOO" (multiple spaces, repeated words)
+    {"YOUR         TOO TOO", "dc21a8573bde65a50d54bf14a6bd51220352f8a2027e1f2cadfcdf56d28744aaa0014604217e"}
+};
+
 // Self-test function to verify the implementation
 bool s19h::self_test() { // do not use this. do not use this hash in general actually wtf are you doing here
-    struct TestVector {
-        const char* input;
-        const char* expected_hex;
-    };
-    TestVector test_vectors[] = { // none of these are accurate please accurateize them and make this thing global
-                                  // and in a seperate commit actually make a check function for once
-        // Empty string hash (reference o implemenutput from originaltation)
-        {"","6dca21463713586427a0c96f1fc654f63b0356954706e2c1268c1da51a48b28acecf42db9d9e"},
-        // Hash of "sans19" (reference output from original implementation)
-        {"sans19","f63bfa1ca3eb70585c3c75bbc366ddf84042dbff8df66349746587e40692741c1b3cba7ccf87"},
-        // Hash of "YOUR TAKING TOO LONG" (used for regression testing)
-        {"YOUR TAKING TOO LONG", "e0442e73331dc9b13eb56b36df6072e82f8c65cec10fb95dbee74480fa49fc69cc7db8e3c3ee"},
-        // Hash of "YOUR         LONG" (tests handling of multiple spaces)
-        {"YOUR         LONG", "24ac897fbb26a409d868bba5f4f66ef41a0b38a83e3b007b928dba600af03ddfcf40b7e14ca0"},
-        // Hash of "your taking too long :)" (tests lowercase and punctuation)
-        {"your taking too long :)", "94488c6761fb5d880c5d9be31c88d89c5cad3bd3c8719da452f42aae150ce0e1558e54f4f8ec"},
-        // Hash of "your taking too long :) IS TAKING TOO LONG" (longer input, mixed case)
-        {"your taking too long :) IS TAKING TOO LONG", "5a1d3f72e8799023c1a5dfaf65ff7d4b430d3b369e538295ccc883547aecca46e9db6ce6e064"},
-        // Hash of "YOUR TOO BRIGHT" (different phrase, regression test)
-        {"YOUR TOO BRIGHT", "a97ce4d060da15c38623d166c281143245d537f4782e7f1c498ec2cf67371fa2d918c57618ca"},
-        // Hash of "YOUR TAKING TOO TOO" (repeated words, regression test)
-        {"YOUR TAKING TOO TOO", "22b800309db316fba64ae6599301d0deaeaad5c758ff5e98b9d980010cd6353ee43078e687e7"},
-        // Hash of "YOUR         TOO TOO" (multiple spaces, repeated words)
-        {"YOUR         TOO TOO", "36a6b694422fab47a9b3744b86f0bce35cb8adfd2f76f9149a979c6f46038c2c76fc95496f56"}
-    };
-
     for (const auto& test : test_vectors) {
         s19h hasher;
         hasher.update(reinterpret_cast<const uint8_t*>(test.input), std::strlen(test.input));

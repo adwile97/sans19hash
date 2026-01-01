@@ -50,3 +50,6 @@ CMakeCache.txt
 
 # .vscode editor settings
 .vscode/
+
+# Ignore build scripts
+build.bat

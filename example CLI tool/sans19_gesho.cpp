@@ -3,21 +3,9 @@
 #include <cstring>
 #include "sans19hash.h"
 int main() {
-    const char* test_strings[] = {
-        "",
-        "sans19",
-        "YOUR TAKING TOO LONG",
-        "YOUR         LONG",
-        "your taking too long :)",
-        "your taking too long :) IS TAKING TOO LONG",
-        "YOUR TOO BRIGHT",
-        "YOUR TAKING TOO TOO",
-        "YOUR         TOO TOO"
-    };
-
-    for (const char* s : test_strings) {
+    for (int i = 0; i < NUM_TEST_VECTORS; ++i) {
         s19h h;
-        h.update(reinterpret_cast<const uint8_t*>(s), strlen(s));
+        h.update(reinterpret_cast<const uint8_t*>(test_vectors[i].input), strlen(test_vectors[i].input));
         std::string hex = h.hexdigest();
         std::cout << hex << std::endl;
     }
