@@ -134,7 +134,7 @@ std::string s19h::finalize256() {
         for (int i = 0; i < 4; ++i) {
             state[i] ^= length;
             state[i] = colorpuzzle(state[i], tail);
-            tail <<= (state[i] >> ((kromer * 17 % 60) % 49)); // make the tail less of a constant mask
+            tail <<= ((state[i] >> (kromer * 17 % 60)) % 49); // make the tail less of a constant mask
             if (cycles % 2 == 0) {
                 tail >>= 5;
             }
@@ -182,7 +182,7 @@ TestVector test_vectors[] = {
     // Hash of "your taking too long :)" (tests lowercase and punctuation)
     {"your taking too long :)", "bd4036fce521f4bc977bc794aa32a2463b027f3c27b7edada912a5092147aaf6627e9d62e98f"},
     // Hash of "your taking too long :) IS TAKING TOO LONG" (longer input, mixed case)
-    {"your taking too long :) IS TAKING TOO LONG", "4f9bb477302dcf48e6f259ad876a7840b3f699c228d6bc09fdb0d2d7e5890348a43fb24f3926"},
+    {"your taking too long :) IS TAKING TOO LONG", "4f9bb477302dcf484861c12015c5141bb3f699c228d6bc09fdb0d2d7e58903488297967a93ff"},
     // Hash of "YOUR TOO BRIGHT" (different phrase, regression test)
     {"YOUR TOO BRIGHT", "a59b95fa0d5f390cadd50a6ff8713ec0dff7d5f3711bd1f1f9fe8c91e674c115975e9afc6164"},
     // Hash of "YOUR TAKING TOO TOO" (repeated words, regression test)

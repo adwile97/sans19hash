@@ -31,6 +31,7 @@ private:
     uint16_t kromer;
     uint16_t mybrotherhasavery;
     uint8_t SPECIALATTACK;
+    
 };
 
 #endif // SANS19_HASH_H

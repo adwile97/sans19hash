@@ -35,8 +35,13 @@ int main(int argc, char* argv[]) {
 
     s19h hasher;
     hasher.update(buffer.data(), buffer.size());
-    std::string hash = hasher.hexdigest();
+    if (rawMode) {
+        std::string rawHash = hasher.finalize256();
+        std::cout << "sans19-256 Hash: " << rawHash << "\n";
+        return 0;
+    }
+    std::string hash = hasher.hexdigest256();
 
-    std::cout << "SANS19 Hash: " << hash << "\n";
+    std::cout << "sans19-256 Hash: " << hash << "\n";
     return 0;
 }
