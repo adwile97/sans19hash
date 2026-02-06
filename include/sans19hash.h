@@ -23,6 +23,7 @@ public:
     std::string hexdigest(); // Hex string
     std::string hexdigest256();
     static bool self_test();
+    void unlock(int which = 0); // reallow stage 2
     
 private:
     uint64_t state[4];
@@ -31,7 +32,10 @@ private:
     uint16_t kromer;
     uint16_t mybrotherhasavery;
     uint8_t SPECIALATTACK;
-    
+    bool stage2flag = false;
+    std::string cachedhash;
+    bool stage2flag256 = false;
+    std::string cachedhash256;
 };
 
 #endif // SANS19_HASH_H

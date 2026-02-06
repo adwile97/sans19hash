@@ -48,7 +48,7 @@ uint64_t colorpuzzle(uint64_t v, uint64_t k) {
 uint16_t blend4(uint64_t sans, uint64_t deltarune) {
     sans ^= deltarune >> 32;
     sans ^= sans >> 35;
-    sans = ( ( sans ^ (sans >> ((deltarune * sans) % 32)))
+    sans = ( ~( sans ^ (sans >> ((deltarune * sans) % 32)))
            * ((sans << 7) | (sans % 10000) ) & 0xFFFF );
     sans ^= sans >> (deltarune % 63);
     return sans & 0xFFFF;
@@ -69,9 +69,10 @@ s19h::s19h() {
     length = 0;
     kromer = 3;
     SPECIALATTACK = (state[2] - 1) %16; 
+    unlock();
 }
 
-void s19h::update(const uint8_t* data, size_t len) {
+void s19h::update(const uint8_t* data, size_t len) { // Stage 1
     length += len;
     kromer = (kromer + state[(tail ^ SPECIALATTACK) % 4] + len) % UINT16_MAX;
 
@@ -90,7 +91,7 @@ void s19h::update(const uint8_t* data, size_t len) {
                 SANS19_PRIME ^ (kromer & 0xF)
             );
         state[2] = colorpuzzle(
-                state[2] ^ (static_cast<uint64_t>(b + (kromer * 19)) << (i % 64)),
+                ~(state[2] ^ (static_cast<uint64_t>(b + (kromer * 19)) << (i % 64))),
                 SANS19_CONST + i + (kromer % 13)
         );
         state[3] = colorpuzzle(
@@ -106,10 +107,12 @@ void s19h::update(const uint8_t* data, size_t len) {
 
 // todo: make these not change the hash
 
-std::string s19h::finalize() {
+std::string s19h::finalize() { // stage 2
+    if (stage2flag) return cachedhash; // if finalize was already called, return the cached hash
     for (int i = 0; i < 4; ++i) {
         state[i] ^= length;
         state[i] = colorpuzzle(state[i], SANS19_CONST + i * 31);
+        
     }
 
     tail ^= length & 0xFFFF;
@@ -124,10 +127,13 @@ std::string s19h::finalize() {
     tail ^= (tail >> 48) ^ ((tail >> 56) << 8); // making the tail 6 bytes
     write_be48(reinterpret_cast<uint8_t*>(buf), tail);
     out.append(buf, 6);
+    stage2flag = true;
+    cachedhash = out;
     return out; // 38 bytes
 }
 
-std::string s19h::finalize256() {
+std::string s19h::finalize256() { // stage 2-256
+    if (stage2flag256) return cachedhash256; // if finalize256 was already called, return the cached hash
     tail ^= length & 0xFFFF;
     tail = colorpuzzle(tail, SANS19_CONST ^ SANS19_PRIME);
     for (int cycles = 0; cycles < 19; ++cycles) {
@@ -148,6 +154,8 @@ std::string s19h::finalize256() {
         write_be64(reinterpret_cast<uint8_t*>(buf), state[i]);
         out.append(buf, 8);
     }
+    stage2flag256 = true;
+    cachedhash256 = out;
         return out; // 32 bytes
 }
     
@@ -202,4 +210,17 @@ bool s19h::self_test() { // do not use this. do not use this hash in general act
         }
     }
     return true; // All tests passed
+}
+
+// Reallow stage 2. If called as unlock(256), only reset the 256 variables. if called as unlock(304), only reset the 304 variables.
+// To reset the state entirely call s19h::s19h() instead.
+void s19h::unlock(int which = 0) {
+    if (!(which % 256)) {
+        cachedhash256.clear();
+        stage2flag256 = true;
+    }
+    if (!(which % 304)) {
+        cachedhash.clear();
+        stage2flag = true;
+    }
 }
