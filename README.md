@@ -36,3 +36,6 @@ You can update the hash in chunks of any byte size, and the final digest will be
 # DISCLAIMER
 Sans19 is actively being tested and tweaked. The math and output may change in future versions.
 This is **not** a stable or finalized implementation. **Do not use this API for any purpose in any serious project.**
+
+### Note
+I will port/have ported this repository to Rust for future development.
