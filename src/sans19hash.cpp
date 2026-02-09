@@ -104,15 +104,12 @@ void s19h::update(const uint8_t* data, size_t len) { // Stage 1
     }
 }
 
-
-// todo: make these not change the hash
-
 std::string s19h::finalize() { // stage 2
     if (stage2flag) return cachedhash; // if finalize was already called, return the cached hash
     for (int i = 0; i < 4; ++i) {
         state[i] ^= length;
         state[i] = colorpuzzle(state[i], SANS19_CONST + i * 31);
-        
+
     }
 
     tail ^= length & 0xFFFF;

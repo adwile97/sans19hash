@@ -15,6 +15,7 @@ This library provides a C++ implementation of the **two** sans19 hash functions:
      std::string input = "ererererer";
      hasher.update(reinterpret_cast<const uint8_t*>(input.c_str()), input.size());
      std::string rawhash = hasher.finalize(); // for binary data
+     hasher = s19h() // reset the entire state
      ```
 - **sans19-256**: The more useful 32-byte implementation.
    - Usage for strings:
@@ -25,12 +26,13 @@ This library provides a C++ implementation of the **two** sans19 hash functions:
      std::string input = "ererererer";
      hasher.update(reinterpret_cast<const uint8_t*>(input.c_str()), input.size());
      std::string hexhash = hasher.hexdigest256(); // for hex string
+     hasher.unlock(256) // allow recomputing the second part of the algorithm which happens in the finalize
+                        // without changing the internal state, for some reason.
      ```
 
 This implementation works in 8-bit (1-byte) chunks, making it suitable for hashing streams without loading everything into memory.
-You can update the hash in chunks of any byte size, and the final digest will be the same. Finalizing twice changes the hash, so it is not advised.
+You can update the hash in chunks of any byte size, and the final digest will be the same.
 
 # DISCLAIMER
 Sans19 is actively being tested and tweaked. The math and output may change in future versions.
-This is **not** a stable or finalized implementation. **Do not use this API for any purpose in any serious project before it is finalized.** Even then, do your own research.
-I will not call any of these hash functions cryptographically viable if I have no evidence to suggest so.
+This is **not** a stable or finalized implementation. **Do not use this API for any purpose in any serious project.**
